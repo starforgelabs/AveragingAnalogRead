@@ -1,0 +1,7 @@
+BaseAnalogRead KEYWORD1
+Read           KEYWORD2
+Reading        KEYWORD3
+PinNumber      KEYWORD4
+setPinNumber   KEYWORD5
+BufferSize     KEYWORD6
+setBufferSize  KEYWORD7
