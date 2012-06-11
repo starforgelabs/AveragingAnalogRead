@@ -17,79 +17,26 @@
 #include <math.h>
 
 
-AveragingAnalogRead::AveragingAnalogRead()
+AveragingAnalogRead::AveragingAnalogRead(byte aPinNumber) : BufferedAnalogRead(aPinNumber)
 {
-  BaseAnalogRead::BaseAnalogRead();
-
-  Init(MAX_BUFFER_BITS);
+  Init();
 }
 
-void AveragingAnalogRead::AddToBuffer(int aValue)
+void AveragingAnalogRead::Event_NewValue(int aValue, byte aIndex)
 {
-  _Total -= _Buffer[_Head];
-  _Buffer[_Head] = aValue;
   _Total += aValue;
-
-  _Head = (_Head+1) % _BufferSize;
-
-  if(_Count < _BufferSize)
-    _Count++;
+  Reading = trunc((1.0 * _Total)/Count() + 0.5);
 }
 
-unsigned int AveragingAnalogRead::BufferSize()
+void AveragingAnalogRead::Event_ReplaceValue(int aOldValue, int aNewValue, byte aIndex)
 {
-  return _BufferSize;
+  _Total += aNewValue - aOldValue;
+  byte count = BufferSize();
+  Reading = (_Total / (count/2)+1) / 2;
 }
 
-int AveragingAnalogRead::CalculateAverage()
+void AveragingAnalogRead::Init()
 {
-  if(_Count == _BufferSize)
-    return ((_Total >> (_BufferBits-1)) + 1) >> 1;
-  else
-    return trunc((1.0 * _Total)/_Count + 0.5);
-}
-
-void AveragingAnalogRead::Init(const byte aBufferBits)
-{
-  _BufferBits = aBufferBits;
-  _BufferSize = 1 << aBufferBits;
-
-  for(int i=0; i<_BufferSize; i++)
-    _Buffer[i] = 0;
-
-  _Count = 0;
-  _Head = 0;
   _Total = 0;
-}
-
-int AveragingAnalogRead::Read()
-{
-  int lReading = BaseAnalogRead::Read();
-
-  AddToBuffer(lReading);
-  int lAverage = CalculateAverage();
-
-  Reading = lAverage;
-  return Reading;
-}
-
-bool AveragingAnalogRead::setBufferSize(const unsigned int aSize)
-{
-  if(aSize > MAX_BUFFER_SIZE) return false;
-  if(aSize < MIN_BUFFER_SIZE) return false;
-
-  int count = 1;
-  unsigned int size = aSize;
-  while(size % 2 == 0) 
-  {
-    size >>= 1;
-    count++;
-  }
-
-  // Ensure there are no other bits; that the size is a power of two.
-  if(size/2 != 0) return false;
-
-  Init(count);
-  return true;
 }
 

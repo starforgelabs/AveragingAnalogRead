@@ -31,7 +31,7 @@
 //
 // USE
 //
-// * Set the pin with setPinNumber() (inherited from BaseAnalogRead).
+// * Set the pin with setPinNumber() (inherited from BufferedAnalogRead).
 // * Optionally set the buffer size.
 // * Call the Read() method.
 //
@@ -41,46 +41,25 @@
 //
 //
 
-#include <BaseAnalogRead.h>
+#include <BufferedAnalogRead.h>
 
-const byte MAX_BUFFER_BITS = 5;
-const byte MAX_BUFFER_SIZE = 1 << MAX_BUFFER_BITS;
-const byte MIN_BUFFER_BITS = 1;
-const byte MIN_BUFFER_SIZE = 1 << MIN_BUFFER_BITS;
-
-class AveragingAnalogRead :public BaseAnalogRead
+class AveragingAnalogRead :public BufferedAnalogRead
 {
   public:
-    AveragingAnalogRead();
+    AveragingAnalogRead(byte aPinNumber=0);
 
-    //
-    // Obtain the current sensor reading. 
-    //
-    virtual int Read();
+  protected:
+    void Event_NewValue(int aValue, byte aIndex);
+    void Event_ReplaceValue(int aOldValue, int aNewValue, byte aIndex);
+    void Event_Reset() {Init();}
 
-    // Retrieve the buffer size
-    unsigned int BufferSize();
-
-    // Set the buffer size. To remain efficient,
-    // this is restricted to powers of two up to MAX_BUFFER_SIZE.
-    //
-    // Changing this value will reset all the readings.
-    //
-    // This returns true if successful, or false if unsuccessful.
-    bool setBufferSize(const unsigned int aSize);
+    // Running total of the buffer.
+    unsigned long Total() { return _Total; }
 
   private:
-    unsigned int _Buffer[MAX_BUFFER_SIZE];
-    byte _BufferBits;
-    unsigned int _BufferSize;
-    byte _Count;
-    byte _Head;
-    unsigned long int _Total;
+    unsigned long _Total;
 
-    void AddToBuffer(int aValue);
-    int CalculateAverage();
-    void Init(const byte aBufferBits);
-
+    void Init();
 };
 
 #endif // AVERAGING_ANALOG_READ_H
