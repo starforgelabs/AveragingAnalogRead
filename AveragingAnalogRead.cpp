@@ -1,6 +1,5 @@
 /*
  *  AveragingAnalogRead.cpp
- *  Sun Tracker
  *
  *  Created by 治永夢守 on 12/05/27.
  *  Copyright 2012 James Knowles. All rights reserved.
@@ -9,6 +8,8 @@
  * Attribution-ShareAlike 3.0 Unported License.
  *
  * https://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * This code is strictly "as is". Use at your own risk. 
  *
  *
  */
@@ -25,14 +26,14 @@ AveragingAnalogRead::AveragingAnalogRead(byte aPinNumber) : BufferedAnalogRead(a
 void AveragingAnalogRead::Event_NewValue(int aValue, byte aIndex)
 {
   _Total += aValue;
-  Reading = trunc((1.0 * _Total)/Count() + 0.5);
+  Value = trunc((1.0 * _Total)/Count() + 0.5);
 }
 
 void AveragingAnalogRead::Event_ReplaceValue(int aOldValue, int aNewValue, byte aIndex)
 {
   _Total += aNewValue - aOldValue;
   byte count = BufferSize();
-  Reading = (_Total / (count/2)+1) / 2;
+  Value = (_Total / (count/2)+1) / 2;
 }
 
 void AveragingAnalogRead::Init()

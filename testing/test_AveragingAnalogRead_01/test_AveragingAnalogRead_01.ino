@@ -17,8 +17,7 @@ TestAveragingAnalogRead tester;
 
 int insert(int aValue)
 {
-  tester.Reading = aValue;
-  return tester.Read();
+  return tester.Read(aValue);
 }
 
 test(clear)
@@ -143,7 +142,6 @@ test(setbuffersize)
 
 void setup()
 {
-  tester.Enabled = false;
 }
 
 void loop()
